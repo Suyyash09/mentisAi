@@ -1,31 +1,24 @@
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../utils/firebase.js";
-import api from "../utils/axios.js";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+
+import Home from "./pages/Home";
+import getCurrentUser from "./features/getCurrentUser.js";
+import { setUserdata } from "./redux/userSlice.js";
 
 function App() {
-  const handleLogin = async (token) => {
-    try {
-      const { data } = await api.post("/auth/login", { token });
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const googleLogin = async () => {
-    const data = await signInWithPopup(auth, googleProvider);
-    const token = await data.user.getIdToken();
-    console.log(token);
-    await handleLogin(token);
-    console.log(data);
-  };
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const getUser = async () => {
+      const data = await getCurrentUser();
+      dispatch(setUserdata(data));
+    };
+    getUser();
+  }, []);
 
   return (
-    <div className="w-full h-screen bg-black flex items-center justify-center">
-      <button className="w-50 h-24 bg-amber-500" onClick={googleLogin}>
-        continue with google
-      </button>
-    </div>
+    <>
+      <Home />
+    </>
   );
 }
 
